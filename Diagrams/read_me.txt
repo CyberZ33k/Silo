@@ -1,0 +1,1 @@
+In this folder you will find examples of network diagram enviroments. If you have any questions just ask.
