@@ -1,0 +1,51 @@
+---
+  - name: Install and configure Elk stack container
+    hosts: elk
+    become: true
+    tasks:
+
+    - name: uninstall apache hhtpd (state=present is optional)
+      apt:
+        name: apache2
+        state: absent
+
+    # use sysctl module
+    - name: Use sysctl to increase memory on VM
+      sysctl:
+        name: vm.max_map_count
+        value: "262144"
+        state: present
+        reload: yes
+
+    - name: Install docker.io
+      apt:
+        name: docker.io
+        update_cache: yes
+        state: present
+
+    - name: Install Python3-pip
+      apt:
+       name: python3-pip
+       state: present
+
+    - name: Install Docker using pip
+      pip:
+        name: docker
+        state: present
+
+    - name: Install Elk
+      docker_container:
+       name: elk
+       image: sebp/elk:761
+       restart_policy: always
+       published_ports:
+       state: started
+       published_ports:
+         - 5601:5601
+         - 9200:9200
+         - 5044:5044
+
+    - name: Enable docker service on restart
+      systemd:
+        name: docker
+        enabled: yes
